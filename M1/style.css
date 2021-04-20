@@ -1,0 +1,46 @@
+.groupButton, .utilityButton {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 18%;
+    width: 25%;
+}
+
+.letterButton{
+    position: relative;
+    display: inline-block;
+    height: 100%;
+    width: 15%;
+    top: -120%;
+    margin: 1px;
+    text-align: center;
+}
+
+.buttonLabel {
+    display: inline-block;;
+    position: absolute;
+    pointer-events: none;
+}
+
+#back {
+    width: 10%;
+}
+
+#keyboard {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 256px;
+    height: 256px;
+    border:1px solid black;
+}
+
+#inputText {
+    position: relative;
+    height: 15%;
+    width: 60%;
+    font-size:24px;
+}
