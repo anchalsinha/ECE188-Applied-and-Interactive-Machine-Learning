@@ -1,11 +1,8 @@
-const maxScale = 1.2;
-const minScale = 0.8;
-const stepScale = 0.15;
-const maxRot = 15;
-const minRot = -15;
-const stepRot = 6;
+const maxRot = 10;
+const minRot = -10;
+const stepRot = 4;
 
-function transformDrawing(base64data, angle, scale) {
+function transformDrawing(base64data, angle) {
     var transformCanvas = document.createElement("canvas");
     transformCanvas.width = 256;
     transformCanvas.height = 256;
@@ -18,7 +15,8 @@ function transformDrawing(base64data, angle, scale) {
             transformCtx.translate(image.width / 2, image.height / 2);
             const rad = angle * Math.PI / 180;
             transformCtx.rotate(rad);
-            transformCtx.drawImage(image, -image.width / 2, -image.width / 2, image.width / scale, image.height / scale);
+            transformCtx.drawImage(image, -image.width / 2, -image.width / 2, image.width, image.height);
+
             resolve(transformCanvas.toDataURL("image/png"));
         };
     });
@@ -29,10 +27,8 @@ async function augmentData() {
         await Promise.all(data[key].map(async img => {
             let transformed = [];
             for (let rot = minRot; rot <= maxRot; rot += stepRot) {
-                for (let scale = minScale; scale <= maxScale; scale += stepScale) {
-                    const transformedImg = await transformDrawing(img, rot, scale);
-                    transformed.push(transformedImg);
-                }
+                const transformedImg = await transformDrawing(img, rot);
+                transformed.push(transformedImg);
             }
             data[key] = data[key].concat(transformed);
         }));
@@ -63,7 +59,7 @@ $("#exportButton").click(async function () {
     console.log(data);
     Object.keys(data).forEach(function (key) {
         let counter = 0;
-        const name = emojiUnicode(key);
+        const name = key;
         let folder = zip.folder(name);
 
         data[key].forEach(function (img) {
@@ -76,4 +72,43 @@ $("#exportButton").click(async function () {
         .then(function (content) {
             saveAs(content, "data.zip");
         });
+});
+
+$("#importButton").click(async function () {
+    data = await new JSZip.external.Promise(function (resolve, reject) {
+        JSZipUtils.getBinaryContent('../data/data.zip', function (err, data) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    }).then(data => {
+        return JSZip.loadAsync(data);
+    }).then(zip => {
+        let importData = {}
+        let total = Object.keys(zip.files).length;
+        let counter = 0;
+        return new Promise(async (resolve, reject) => {
+            zip.forEach((path, file) => {
+                const [label, filename] = path.split('/');
+                if (!file.dir) { //check if file or dir
+                    if (!(label in importData)) {
+                        importData[label] = []
+                        createCategory(String.fromCodePoint(parseInt (label, 16)));
+                    }
+                    file.async('base64').then(contents => {
+                        importData[label].push(contents);
+                        counter += 1;
+                        if (counter == total) {
+                            console.log("Resolving");
+                            resolve(importData);
+                        }
+                    });
+                }
+                else
+                    counter += 1;
+            });
+        });
+    });
 });

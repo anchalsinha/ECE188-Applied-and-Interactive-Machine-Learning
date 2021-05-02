@@ -5,7 +5,9 @@ var categoryButtons = [];
 var data = {};
 
 function saveDrawing() {
-    const label = $(this).currText();
+    const label = emojiUnicode($(this).currText());
+    if (!(label in data))
+        data[label] = []
     const img = canvas.toDataURL("image/png");
     data[label].push(img);
     const counter = $(this).find("span");
@@ -18,20 +20,19 @@ $.fn.currText = function() {
 };
 
 emojiPicker = new emojiButtonList("createCategoryButton", {
-    onEmojiClick: function(emojiText) {
-        data[emojiText] = [];
-
-        var newCategoryButton = document.createElement("button");
-        newCategoryButton.id = "categoryButton";
-        newCategoryButton.innerHTML = emojiText;
-        newCategoryButton.addEventListener("click", saveDrawing);
-
-        var newCategoryCounter = document.createElement("span");
-        newCategoryCounter.id = "categoryButtonCounter";
-        newCategoryCounter.innerHTML = "0";
-
-        newCategoryButton.appendChild(newCategoryCounter);
-        categoryButtonWrapper.append(newCategoryButton);
-    }
+    onEmojiClick: createCategory 
 });
 
+function createCategory(emojiText) {
+    var newCategoryButton = document.createElement("button");
+    newCategoryButton.id = "categoryButton";
+    newCategoryButton.innerHTML = emojiText;
+    newCategoryButton.addEventListener("click", saveDrawing);
+
+    var newCategoryCounter = document.createElement("span");
+    newCategoryCounter.id = "categoryButtonCounter";
+    newCategoryCounter.innerHTML = "0";
+
+    newCategoryButton.appendChild(newCategoryCounter);
+    categoryButtonWrapper.append(newCategoryButton);
+}
