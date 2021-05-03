@@ -4,8 +4,8 @@ const stepRot = 4;
 
 function transformDrawing(base64data, angle) {
     var transformCanvas = document.createElement("canvas");
-    transformCanvas.width = 256;
-    transformCanvas.height = 256;
+    transformCanvas.width = 150;
+    transformCanvas.height = 150;
     var transformCtx = transformCanvas.getContext("2d");
 
     var image = new Image();
@@ -72,43 +72,4 @@ $("#exportButton").click(async function () {
         .then(function (content) {
             saveAs(content, "data.zip");
         });
-});
-
-$("#importButton").click(async function () {
-    data = await new JSZip.external.Promise(function (resolve, reject) {
-        JSZipUtils.getBinaryContent('../data/data.zip', function (err, data) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(data);
-            }
-        });
-    }).then(data => {
-        return JSZip.loadAsync(data);
-    }).then(zip => {
-        let importData = {}
-        let total = Object.keys(zip.files).length;
-        let counter = 0;
-        return new Promise(async (resolve, reject) => {
-            zip.forEach((path, file) => {
-                const [label, filename] = path.split('/');
-                if (!file.dir) { //check if file or dir
-                    if (!(label in importData)) {
-                        importData[label] = []
-                        createCategory(String.fromCodePoint(parseInt (label, 16)));
-                    }
-                    file.async('base64').then(contents => {
-                        importData[label].push(contents);
-                        counter += 1;
-                        if (counter == total) {
-                            console.log("Resolving");
-                            resolve(importData);
-                        }
-                    });
-                }
-                else
-                    counter += 1;
-            });
-        });
-    });
 });

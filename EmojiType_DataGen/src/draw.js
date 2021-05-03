@@ -1,6 +1,6 @@
 var canvas = $('#drawingCanvas')[0];
-canvas.width = 256;
-canvas.height = 256;
+canvas.width = 150;
+canvas.height = 150;
 var bounds = canvas.getBoundingClientRect();
 
 var ctx = canvas.getContext('2d');
