@@ -5,9 +5,10 @@ var keyboard = $('#keyboard')[0];
 var currentKeyboard = 0; //0 for alphabet, 1 for emoji
 
 const input = $("#inputText");
-inputTextAppend('');
 
 var prevCase = "ABC";
+
+var currentLine = []
 
 buttons = {}
 
@@ -63,6 +64,8 @@ $(".utilityButton").each(function() {
     let text = id;
     if (id == "back")
         text = "<";
+    else if (text == 'emoji') 
+        text = '😀';
     const label = $('<span>').attr({
         class: 'buttonLabel'
     }).text(text);
@@ -73,7 +76,12 @@ $(".utilityButton").each(function() {
 });
 
 function inputTextAppend(s) {
-    input.val(input.val() + s + '\u200E');
+    currentLine.push(s);
+    input.val('\u200E' + currentLine.join('\u200E') + '\u200E');
+}
+function inputTextDelete() {
+    currentLine.pop();
+    input.val('\u200E' + currentLine.join('\u200E') + '\u200E');
 }
 
 
@@ -101,7 +109,7 @@ $(document).on('mouseup', function(e) {
         inputTextAppend(' ');
     }
     else if (id == 'back' && !buttons[id].disabled) {
-        input.val(input.val().substring(0, input.val().length-1));
+        inputTextDelete();
     }
     else if (id == 'ABC' && !buttons[id].disabled) {
         if (currentKeyboard == 0) {
@@ -122,7 +130,7 @@ $(document).on('mouseup', function(e) {
         } else if (currentKeyboard == 1) {
             emojiCanvas.style.display = 'none';
             keyboard.style.display = 'inline-flex';
-            element.text("emoji");
+            element.text('😀');
             btn.groupLabel.text(prevCase);
             currentKeyboard = 0;
         }

@@ -1,5 +1,9 @@
 
 var ctx = emojiCanvas.getContext('2d');
+ctx.lineJoin = 'round';
+ctx.lineCap = 'round';
+ctx.lineWidth = 5;
+
 var pos = { x: 0, y: 0 };
 
 points = []
@@ -31,9 +35,6 @@ function draw(e) {
         return;
 
     ctx.beginPath();
-
-    ctx.lineWidth = 5;
-    ctx.lineCap = 'round';
 
     ctx.moveTo(pos.x, pos.y);
     setPosition(e);
